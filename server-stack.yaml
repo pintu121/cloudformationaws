@@ -152,6 +152,9 @@ Resources:
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: '20'
+        - Key: stickiness.enabled   # Enable stickiness
+          Value: 'true'
+
       VpcId: !Ref VPC
       TargetType: instance
       LoadBalancerArns:
@@ -169,6 +172,19 @@ Resources:
       HealthCheckTimeoutSeconds: 5  # The amount of time to wait for a response
       HealthyThresholdCount: 3  # The number of consecutive successful health checks required
       UnhealthyThresholdCount: 5
+
+  ListenerRuleWithStickiness:
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /  # Specify your path pattern
+      ListenerArn: !Ref Listener
+      Priority: 1  # Adjust the priority as needed
 
   MyNLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
